@@ -63,10 +63,27 @@ int main() {
   Insert(root,5);
   Insert(root,6);*/
 
+  int a1=1,b1=7;
+  /*
   cout << "\n\npreorder traversal: ";
   traversePreOrder(root);
+  cout << "\n\npreorder traversal: ";
+  traversePreOrderInd(root,a1,b1);
+  
+  int a2=7,b2=7;
   cout << "\n\nInorder traversal: ";
   traverseInOrder(root);
+  cout << "\n\nInorder traversal: ";
+  traverseInOrderInd(root,a1,b1);
+  
+  int a3=7,b3=7;
   cout << "\n\nPostorder traversal: ";
   traversePostOrder(root);
+  cout << "\n\nPostorder traversal: ";
+  traversePostOrderInd(root,a1,b1);
+  */
+
+  PreOrder(root, a1, b1);
+  InOrder(root, a1, b1);
+  PostOrder(root, a1, b1);
 }
