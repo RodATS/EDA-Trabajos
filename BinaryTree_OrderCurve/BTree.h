@@ -56,6 +56,82 @@ void Insert(struct node *r,int data){
 
 
 // Traverse Preorder
+void traversePreOrderInd(struct node *temp, int x, int y) {
+  if (temp != NULL) {
+    if(temp->data == x){
+      cout << " " << temp->data;
+      x=-1;
+    }
+    else{
+        if(temp->data == y){
+          cout << " " << temp->data;
+          y=-1;
+        }
+  
+        else {
+          if(y==-1 or x==-1)
+            cout << " " << temp->data;
+          }
+    }
+    /*
+    traversePreOrder(temp->left);
+    traversePreOrder(temp->right);
+    */
+
+    traversePreOrderInd(temp->left,x,y);
+    traversePreOrderInd(temp->right,x,y);
+  }
+}
+
+// Traverse Inorder
+void traverseInOrderInd(struct node *temp,int x, int y) {
+  if (temp != NULL) {
+    traverseInOrderInd(temp->left,x,y);
+    
+    if(temp->data == x){
+      cout << " " << temp->data;
+      x=-1;
+    }
+    else{
+        if(temp->data == y){
+          cout << " " << temp->data;
+          y=-1;
+        }
+  
+        else {
+          if(y==-1 or x==-1)
+            cout << " " << temp->data;
+          }
+    }
+    traverseInOrderInd(temp->right,x,y);
+  }
+}
+
+// Traverse Postorder
+void traversePostOrderInd(struct node *temp,int x, int y) {
+  if (temp != NULL) {
+    traversePostOrderInd(temp->left,x,y);
+    traversePostOrderInd(temp->right,x,y);
+    if(temp->data == x){
+      cout << " " << temp->data;
+      x=-1;
+    }
+    else{
+        if(temp->data == y){
+          cout << " " << temp->data;
+          y=-1;
+        }
+  
+        else {
+          if(y==-1 or x==-1)
+            cout << " " << temp->data;
+          }
+    }
+  }
+}
+
+//Impresiones completas
+// Traverse Preorder
 void traversePreOrder(struct node *temp) {
   if (temp != NULL) {
     cout << " " << temp->data;
