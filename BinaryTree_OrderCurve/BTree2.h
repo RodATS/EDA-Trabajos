@@ -170,4 +170,30 @@ void traversePostOrderInd(struct node *temp,int x, int y) {
       }
   }
 }
+
+
+//funciones juntas
+//1
+void PreOrder(struct node *temp,int x, int y){
+  cout << "\n\npreorder traversal: ";
+  traversePreOrder(temp);
+  cout << "\n\npreorder traversal: ";
+  traversePreOrderInd(temp,x,y);
+}
+
+//2
+void InOrder(struct node *temp,int x, int y){
+cout << "\n\nInorder traversal: ";
+  traverseInOrder(temp);
+  cout << "\n\nInorder traversal: ";
+  traverseInOrderInd(temp,x,y);
+}
+ //3 
+
+void PostOrder(struct node *temp,int x, int y){
+  cout << "\n\nPostorder traversal: ";
+  traversePostOrder(temp);
+  cout << "\n\nPostorder traversal: ";
+  traversePostOrderInd(temp,x,y);
+}
 #endif
