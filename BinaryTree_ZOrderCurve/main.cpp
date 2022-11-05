@@ -106,7 +106,7 @@ int main() {
 
   cout<<"\n\nBuscar desde : ";cin>>a1;
   cout<<"hasta : ";cin>>b1;
-  cout<<"Modo de busqueda:\n 1) PreOrden\n 2) InOrder\n 3) PostOrder\n 4)Las tres\n Ingresa: ";cin>>opcion;
+  cout<<"Modo de busqueda:\n 1) PreOrden\n 2) InOrder\n 3) PostOrder\n 4)Las tres\n 5)Busqueda por coord\n Ingresa: ";cin>>opcion;
   switch(opcion){
     case 1: 
       cout << "\n\nPreOrder traversal: ";
@@ -133,6 +133,25 @@ int main() {
       cout << "\n\nPostOrder: ";
       traversePostOrderInd(root,a1,b1);
       break;
+    case 5:
+      cout << "Busqueda por coord:" << endl;
+      cout << "Primer Valor:" << endl;
+      int x1,y1; cin >> x1>>y1;
+      cout << "Segundo Valor:" << endl;
+      int x2,y2; cin >> x2>>y2;
+
+      for (int i = x1; i<=x2; i++)
+      {
+        for (int j = y1; j<dim; j++)
+        {
+          cout << res[i][j] << " ";
+          if (j == y2 && i == x2)
+          {
+            break;
+          }
+        }
+      }
+    break;
   }
   
 }
