@@ -25,6 +25,7 @@ int zorder2D(int x, int y){
 
 int res[1000][1000];
 
+//INtento del Hilbert
 //Intercambiar
 void swap(int x, int y, int xn, int yn){
   int aux=res[x][y];
@@ -41,6 +42,7 @@ void Hilbert(int dim){
     }
   }
 }
+//---------------------------
 
 int main() {
   
