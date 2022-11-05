@@ -25,7 +25,22 @@ int zorder2D(int x, int y){
 
 int res[1000][1000];
 
+//Intercambiar
+void swap(int x, int y, int xn, int yn){
+  int aux=res[x][y];
+  res[x][y]=res[xn][yn];
+  res[xn][yn]=aux;
+  return;
+}
 
+//Hilbert Curve
+void Hilbert(int dim){
+  for(int i=0;i<dim;i=i+2){
+    for(int j=0;j<dim;j=j+2){
+      swap(i,j,i+1,j+1);
+    }
+  }
+}
 
 int main() {
   
@@ -40,16 +55,22 @@ int main() {
     for(int y=0; y<ny; y++){
         for(int x=0; x<nx; x++){
             res[y][x] = zorder2D(x,y);
-          
           //Binary tree
-            if(x>0)
-            Insert(root,res[y][x]);
+            /*if(x>0)
+            Insert(root,res[y][x]);*/
+          
+          
           //---------------------------
         }
     }
+
+    Hilbert(dim);
     for(int y=0; y<ny; y++){
         for(int x=0; x<nx; x++){
             cout<<res[y][x]<<"\t";
+            //Binary tree
+            if(x>0)
+            Insert(root,res[y][x]);
         }
         printf("\n");
     }
