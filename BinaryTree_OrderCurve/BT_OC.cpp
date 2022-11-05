@@ -56,14 +56,22 @@ int main() {
         for(int x=0; x<nx; x++){
             res[y][x] = zorder2D(x,y);
           //Binary tree
-            /*if(x>0)
-            Insert(root,res[y][x]);*/
+            if(x>0)
+            Insert(root,res[y][x]);
           
           
           //---------------------------
         }
     }
 
+    for(int y=0; y<ny; y++){
+        for(int x=0; x<nx; x++){
+            cout<<res[y][x]<<"\t";
+        }
+        printf("\n");
+    }
+/*
+  //--------------------------------
     Hilbert(dim);
     for(int y=0; y<ny; y++){
         for(int x=0; x<nx; x++){
@@ -74,7 +82,7 @@ int main() {
         }
         printf("\n");
     }
-
+*/
 
   
   /*
@@ -126,29 +134,3 @@ int main() {
   }
   
 }
-
-//Pruebas
-/*
-cout << "\n\npreorder traversal: ";
-  traversePreOrder(root);
-  cout << "\n\npreorder traversal: ";
-  traversePreOrderInd(root,a1,b1);
-  
-  int a2=7,b2=7;
-  cout << "\n\nInorder traversal: ";
-  traverseInOrder(root);
-  cout << "\n\nInorder traversal: ";
-  traverseInOrderInd(root,a1,b1);
-  
-  int a3=7,b3=7;
-  cout << "\n\nPostorder traversal: ";
-  traversePostOrder(root);
-  cout << "\n\nPostorder traversal: ";
-  traversePostOrderInd(root,a1,b1);
-  */
-
-/*
-  PreOrder(root, a1, b1);
-  InOrder(root, a1, b1);
-  PostOrder(root, a1, b1);
-    */
