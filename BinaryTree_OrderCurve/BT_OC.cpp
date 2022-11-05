@@ -33,7 +33,7 @@ void swap(int x, int y, int xn, int yn){
   return;
 }
 
-//Hilbert Curve
+
 void Hilbert(int dim){
   for(int i=0;i<dim;i=i+2){
     for(int j=0;j<dim;j=j+2){
@@ -47,8 +47,8 @@ int main() {
   //Binary tree
   struct node *root = newNode(0);
   //order curve
-   int dim;
-  cin>>dim;
+  int dim;
+  cout<<"Dimension: ";cin>>dim;
     const int nx=dim,ny=dim;
     //int res[ny][nx];
 
@@ -84,9 +84,52 @@ int main() {
   Insert(root,5);
   Insert(root,6);*/
 
-  int a1=1,b1=7;
-  /*
+  int a1,b1, opcion;
   cout << "\n\npreorder traversal: ";
+  traversePreOrder(root);
+
+  cout << "\n\nInorder traversal: ";
+  traverseInOrder(root);
+
+  cout << "\n\nPostorder traversal: ";
+  traversePostOrder(root);
+
+  cout<<"\n\nBuscar desde : ";cin>>a1;
+  cout<<"hasta : ";cin>>b1;
+  cout<<"Modo de busqueda:\n 1) PreOrden\n 2) InOrder\n 3) PostOrder\n 4)Las tres\n Ingresa: ";cin>>opcion;
+  switch(opcion){
+    case 1: 
+      cout << "\n\nPreOrder traversal: ";
+      traversePreOrderInd(root,a1,b1);
+      break;
+
+    case 2:
+      cout << "\n\nInorder: ";
+      traverseInOrderInd(root,a1,b1);
+      break;
+
+    case 3:
+      cout << "\n\nPostorder: ";
+      traversePostOrderInd(root,a1,b1);
+      break;
+
+    case 4:
+      cout << "\n\nPreOrder: ";
+      traversePreOrderInd(root,a1,b1);
+    
+      cout << "\n\nInOrder: ";
+      traverseInOrderInd(root,a1,b1);
+    
+      cout << "\n\nPostOrder: ";
+      traversePostOrderInd(root,a1,b1);
+      break;
+  }
+  
+}
+
+//Pruebas
+/*
+cout << "\n\npreorder traversal: ";
   traversePreOrder(root);
   cout << "\n\npreorder traversal: ";
   traversePreOrderInd(root,a1,b1);
@@ -104,7 +147,8 @@ int main() {
   traversePostOrderInd(root,a1,b1);
   */
 
+/*
   PreOrder(root, a1, b1);
   InOrder(root, a1, b1);
   PostOrder(root, a1, b1);
-}
+    */
