@@ -7,5 +7,4 @@ CCOMP 6-2
 
 El trabajo es el BinaryTree_ZOrderCurve.
 
-(ENTER)
 En el archivo ZOrder-QT está el intento de utilizar un QuadTree con el ZOrder.
