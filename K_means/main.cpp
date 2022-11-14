@@ -35,7 +35,7 @@ class kmeans
     int n;
     img *image;
     rgb *means;
-    std::vector<Cluster> *clusters;
+    vector<Cluster> *clusters;
     kmeans(img*, int);
     void initialize();
     void clusterize(int);
@@ -47,15 +47,18 @@ Cluster::Cluster()
 Cluster::Cluster(rgb col, int ux, int uy): color(col), x(ux), y(uy)
 {}
 
-kmeans::kmeans(img *uimage, int uk): image(uimage), n(uk)
+kmeans::kmeans(img *uimage, int uk)
 {
-    means = new rgb[n];
-    clusters = new std::vector<Cluster>[n];
+    image = uimage;
+    n = uk;
+	means = new rgb[n];
+    clusters = new vector<Cluster>[n];
 }
 
 void kmeans::initialize()
 {
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) 
+	{
         int tx = (rand() % image->width);
         int ty = (rand() % image->height);
         means[i] = image->data[ty][tx];
@@ -69,7 +72,8 @@ int rgbdistance(rgb a, rgb b)
 
 void kmeans::clusterize(int iter)
 { 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) 
+	{
         clusters[i].clear();
     }
 
@@ -122,12 +126,13 @@ void write_modified(img image)
   unsigned char *data;
   cout <<"Archivo escrito: " << fname << " Width: " << image.width << " Height: " << image.height << endl;
   
-  //printf("Name of wrote file: %s\nWidth: %d\nHeight: %d\n", fname, image.width, image.height);
-  
     fwrite(image.header, sizeof(unsigned char), 54, res);
-    for (int i = 0; i < image.height; i++) {
+    
+    for (int i = 0; i < image.height; i++) 
+	{
         data = (unsigned char *)malloc(sizeof(char) * image.row_padded);
-        for (int j = 0; j < image.width * 3; j+=3) {
+        for (int j = 0; j < image.width * 3; j+=3) 
+		{
             data[j] = image.data[i][j / 3].b;
             data[j + 1] = image.data[i][j / 3].g;
             data[j + 2] = image.data[i][j / 3].r;
@@ -190,7 +195,7 @@ int main()
 {
   char* name = "sp.bmp";
   img image = mainBMP(name);
-  kmeans mk(&image, 6);
+  kmeans mk(&image, 3);
   mk.initialize();
   mk.clusterize(10);
   write_modified(image);
