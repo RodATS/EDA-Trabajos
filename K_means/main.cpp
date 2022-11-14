@@ -1,200 +1,198 @@
-#include <cmath>
 #include <iostream>
-#include <math.h>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
-#include <string>
+#include <sys/types.h>
+#include <limits.h>
 #include <vector>
-
 using namespace std;
 
-// Estructura para RGB
-struct pixel {
-  unsigned char R;
-  unsigned char G;
-  unsigned char B;
+typedef struct rgb 
+{
+    int r, g, b;
+} rgb;
+
+typedef struct img 
+{
+    unsigned char header[54];
+    rgb **data;
+    int height, width;
+    int row_padded;
+} img;
+
+class Cluster 
+{
+    public:
+    rgb color;
+    int x, y;
+    Cluster();
+    Cluster(rgb, int, int);
 };
 
-// Cálculo de distancia hacia los centroides
-float distancia(pixel a, pixel b) {
-  float r_ = pow((int)a.R - (int)b.R, 2);
-  float b_ = pow((int)a.B - (int)b.B, 2);
-  float g_ = pow((int)a.G - (int)b.G, 2);
-  float dist = sqrt(r_ + b_ + g_);
-  return dist;
+class kmeans 
+{
+    public:
+    int n;
+    img *image;
+    rgb *means;
+    std::vector<Cluster> *clusters;
+    kmeans(img*, int);
+    void initialize();
+    void clusterize(int);
+};
+
+Cluster::Cluster()
+{}
+
+Cluster::Cluster(rgb col, int ux, int uy): color(col), x(ux), y(uy)
+{}
+
+kmeans::kmeans(img *uimage, int uk): image(uimage), n(uk)
+{
+    means = new rgb[n];
+    clusters = new std::vector<Cluster>[n];
 }
 
-// Verificacion de igualdad de centroides
-bool compare(pixel a, pixel b) {
-  if (a.R == b.R && a.B == b.B && a.G == b.G)
-    return true;
-  return false;
-}
-
-// Verificar todos los cemtroides
-bool compare_all(vector<pixel> c, vector<pixel> caux) {
-  for (int i = 0; i < caux.size(); i++) {
-    if (!compare(c[i], caux[i]))
-      return false;
-  }
-  return true;
-}
-
-// Crear pixel vacío
-pixel p_null() {
-  pixel null;
-  null.R = (unsigned char)1;
-  null.G = (unsigned char)1;
-  null.B = (unsigned char)1;
-  return null;
-}
-
-void promedio(pixel &n, vector<pixel *> aux) {
-  int r, g, b;
-  for (int i = 0; i < aux.size(); i++) {
-    r += (int)(*aux[i]).R;
-    g += (int)(*aux[i]).G;
-    b += (int)(*aux[i]).B;
-  }
-  r = r / aux.size();
-  b = b / aux.size();
-  g = g / aux.size();
-  n.R = (unsigned char)r;
-  n.G = (unsigned char)g;
-  n.B = (unsigned char)b;
-}
-
-// Porcesado de image --> Read, Write
-struct img {
-  int width = 0, height = 0;
-  int rowstep = 0;
-  unsigned char *data;
-  unsigned char header[54];
-  pixel **rgb_data;
-
-  img() {}
-  img(char *filename) { ReadBMP(filename); }
-
-  img(pixel **data, int width, int height) {
-    this->rgb_data = data;
-    this->width = width;
-    this->height = height;
-    this->rowstep = width * 3;
-  }
-
-  void ReadBMP(char *filename) {
-    FILE *f = fopen(filename, "rb");
-    if (f == NULL)
-      cout << "Archivo no especificado";
-
-    fread(header, sizeof(unsigned char), 54, f);
-    width = *(int *)&header[18];
-    height = *(int *)&header[22];
-
-    rowstep = (width * 3 + 3) & (~3);
-    unsigned char *data = new unsigned char[rowstep];
-    unsigned char tmp;
-    rgb_data = new pixel *[height];
-    for (int i = 0; i < height; i++) {
-      rgb_data[i] = new pixel[width];
+void kmeans::initialize()
+{
+    for (int i = 0; i < n; i++) {
+        int tx = (rand() % image->width);
+        int ty = (rand() % image->height);
+        means[i] = image->data[ty][tx];
     }
-    for (int i = 0; i < height; i++) {
-      int count = 0;
-      fread(data, sizeof(unsigned char), rowstep, f);
-      for (int j = 0; j < width * 3; j += 3) { // Convert (B, G, R) to (R, G, B)
-        tmp = data[j];
-        data[j] = data[j + 2];
-        data[j + 2] = tmp;
-        rgb_data[i][count].R = data[j];
-        rgb_data[i][count].G = data[j + 1];
-        rgb_data[i][count].B = data[j + 2];
-        count++;
-      }
-    }
-    fclose(f);
-  }
+}
 
-  void write() {
-    char *filename = "comprimido.bmp";
-    FILE *aux = fopen(filename, "w");
-    unsigned char *data;
-    fwrite(header, sizeof(unsigned char), 54, aux);
-    for (int i = 0; i < height; i++) {
-      data = (unsigned char *)malloc(sizeof(char) * rowstep);
-      for (int j = 0; j < width * 3; j += 3) {
-        data[j] = rgb_data[i][j / 3].B;
-        data[j + 1] = rgb_data[i][j / 3].G;
-        data[j + 2] = rgb_data[i][j / 3].R;
-      }
-      fwrite(data, sizeof(unsigned char), rowstep, aux);
-      free(data);
-    }
-    fclose(aux);
-  }
+int rgbdistance(rgb a, rgb b)
+{
+    return sqrt(pow(a.r - b.r, 2) + pow(a.g - b.g, 2) + pow(a.b - b.b, 2));
+}
 
-  // Procesado de datos, y clusterización para la segmentación de la IMG
-  void k_means(int clusters, int attempts = 20) {
-    vector<pixel> centroides(clusters);
-    vector<pixel> caux(clusters);
-    vector<vector<pixel *>> groups(clusters);
-    int index;
-    for (int i = 0; i < clusters; i++) {
-      centroides[i] = rgb_data[rand() % height][rand() % width];
-      if (i > 0 && compare(centroides[i], centroides[i - 1]))
-        centroides[i] = rgb_data[rand() % height][rand() % width];
-      caux[i] = p_null();
+void kmeans::clusterize(int iter)
+{ 
+    for (int i = 0; i < n; i++) {
+        clusters[i].clear();
     }
-    bool igual = false;
-    while (attempts--) {
-      for (int c = 0; c < clusters; c++) {
-        if (!groups[c].empty())
-          groups[c].erase(groups[c].begin(),
-                          groups[c].begin() + groups[c].size());
-      }
 
-      for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-          float min = 99999;
-          for (int c = 0; c < clusters; c++) {
-            float aux = distancia(centroides[c], rgb_data[i][j]);
-            if (aux < min) {
-              min = aux;
-              index = c;
+    for (int i = 0; i < image->height; i++) 
+    {
+        for (int j = 0; j < image->width; j++) 
+        {
+            int dist = INT_MAX;
+            int mink = -1;
+            for (int k = 0; k < n; k++) 
+            {
+                int tdist = rgbdistance(means[k], image->data[i][j]);
+                if (tdist < dist) {
+                    dist = tdist;
+                    mink = k;
+                }
             }
-          }
-          groups[index].push_back(&rgb_data[i][j]);
+            clusters[mink].push_back(Cluster(image->data[i][j], j, i));
         }
-      }
-      int cont = 0;
-      for (int i = 0; i < clusters; i++) {
-        caux[i] = centroides[i];
-        promedio(centroides[i], groups[i]);
-
-        if (compare(caux[i], centroides[i])) {
-          cont++;
-        }
-      }
-      if (cont == clusters)
-        break;
     }
 
-    for (int c = 0; c < clusters; c++) {
-      if (!groups[c].empty()) {
-        for (int i = 0; i < groups[c].size(); i++) {
-          (*groups[c][i]) = centroides[c];
-
-          /*(*groups[c][i]).R = (centroides[c]).R;
-          (*groups[c][i]).G = (centroides[c]).G;
-          (*groups[c][i]).B = (centroides[c]).B;*/
+    for (int i = 0; i < n; i++) 
+    {
+        rgb mean;
+        mean.r = mean.g = mean.b = 0;
+        for (auto j: clusters[i]) 
+        {
+            mean.r += j.color.r;
+            mean.g += j.color.g;
+            mean.b += j.color.b;
         }
-      }
+        means[i].r = mean.r / clusters[i].size();
+        means[i].g = mean.g / clusters[i].size();
+        means[i].b = mean.b / clusters[i].size();
     }
-  }
-};
+    
+    for (int i = 0; i < n; i++) 
+    {
+        for (auto j: clusters[i]) 
+        {
+            image->data[j.y][j.x] = means[i];
+        }
+    }
+}
 
-int main() {
-  char *filename = "image.bmp";
-  img prueba(filename);
-  prueba.k_means(2);
-  //prueba.write();
+void write_modified(img image)
+{
+  char *fname = "adultered.bmp";
+  FILE *res = fopen(fname, "w");
+  unsigned char *data;
+  cout <<"Archivo escrito: " << fname << " Width: " << image.width << " Height: " << image.height << endl;
+  
+  //printf("Name of wrote file: %s\nWidth: %d\nHeight: %d\n", fname, image.width, image.height);
+  
+    fwrite(image.header, sizeof(unsigned char), 54, res);
+    for (int i = 0; i < image.height; i++) {
+        data = (unsigned char *)malloc(sizeof(char) * image.row_padded);
+        for (int j = 0; j < image.width * 3; j+=3) {
+            data[j] = image.data[i][j / 3].b;
+            data[j + 1] = image.data[i][j / 3].g;
+            data[j + 2] = image.data[i][j / 3].r;
+            //data[j] = image.data[i][j / 3].b + 20;
+            //data[j + 1] = 0; //image.data[i][j / 3].g - 5;
+            //data[j + 2] = image.data[i][j / 3].r + 20;
+        }
+        fwrite(data, sizeof(unsigned char), image.row_padded, res);
+        free(data);
+    }
+    fclose(res);
+    cout << "adultered.bmp generado" << endl;
+}
+
+img mainBMP(char* filename)
+{
+    int i;
+    FILE* f = fopen(filename, "rb");
+    img original;
+
+    if(f == NULL)
+        printf("Argument exception\n");
+
+    fread(original.header, sizeof(unsigned char), 54, f); // lee la cabecera
+
+    original.width = 0;
+    original.height = 0;
+    for (int i = 0; i < 4; i++) 
+    {
+        original.width += (int)original.header[i + 18] * pow(16, i * 2);
+        original.height += (int)original.header[i + 22] * pow(16, i * 2);
+    }
+
+    cout <<"Archivo leido: " << filename << " Width: " << original.width << " Height: " << original.height << endl;
+
+    original.row_padded = (original.width * 3 + 3) & (~3);
+    unsigned char* data = (unsigned char*)malloc(sizeof(char) * original.row_padded);
+    char tmp;
+
+    rgb **rgbtabledata = (rgb**)malloc(sizeof(rgb*) * original.height);
+  
+    for(int i = 0; i < original.height; i++) 
+    {
+        rgbtabledata[i] = (rgb*)malloc(sizeof(rgb) * original.width);
+        fread(data, sizeof(unsigned char), original.row_padded, f);
+        
+        for(int j = 0; j < original.width*3; j += 3) 
+        {
+            rgbtabledata[i][j / 3].r = (int)data[j + 2];
+            rgbtabledata[i][j / 3].g = (int)data[j + 1];
+            rgbtabledata[i][j / 3].b = (int)data[j];
+        }
+    }
+    original.data = rgbtabledata;
+    fclose(f);
+    return original;
+}
+
+int main() 
+{
+  char* name = "sp.bmp";
+  img image = mainBMP(name);
+  kmeans mk(&image, 6);
+  mk.initialize();
+  mk.clusterize(10);
+  write_modified(image);
+  return 0;
 }
